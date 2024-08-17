@@ -50,6 +50,10 @@ const consumer = {
 		type: Number,
 		required: true
 	},
+	billMonth: {
+		type: 'string',
+		default: ''
+	},
 	LK: {
 		type: Number
 	},

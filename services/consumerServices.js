@@ -1,8 +1,12 @@
 import { consumerCollection } from '../schema/schema.js';
+import { formatBillMonth } from '../util/helper.js';
 
 export const addConsumer = async (data) => {
 	try {
-		const { conId, name, bill, LK } = data;
+		const { conId, name, bill, LK, billMonth } = data;
+
+		// Format the billMonth
+		const formattedBillMonth = formatBillMonth(billMonth);
 
 		const previousConsumer = await consumerCollection.findOne({
 			conId
@@ -10,16 +14,17 @@ export const addConsumer = async (data) => {
 
 		console.log('previousConsumer', previousConsumer, '\n');
 		console.log('new data to feed', data);
+
 		if (previousConsumer) {
-			//updating previous weight
+			// Updating previous consumer
 			const response = await consumerCollection.updateOne(
 				{ _id: previousConsumer._id },
-				{ $set: { bill, name, LK } }
+				{ $set: { bill, name, LK, billMonth: formattedBillMonth } }
 			);
 			return { data: response, statusCode: 200 };
 		} else {
-			// saving new weight
-			const newConsumer = new consumerCollection(data);
+			// Saving new consumer
+			const newConsumer = new consumerCollection({ ...data, billMonth: formattedBillMonth });
 			const response = await newConsumer.save();
 			return { data: response, statusCode: 200 };
 		}

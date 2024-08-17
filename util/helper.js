@@ -21,3 +21,12 @@ export const matchDate = (date1, date2) => {
 
 	return isSameDate;
 };
+
+export const formatBillMonth = (billMonth) => {
+	const [month, year] = billMonth.toString().split('.');
+	const monthNames = [
+		'January', 'February', 'March', 'April', 'May', 'June',
+		'July', 'August', 'September', 'October', 'November', 'December'
+	];
+	return `${monthNames[parseInt(month) - 1]}, 20${year}`;
+};
