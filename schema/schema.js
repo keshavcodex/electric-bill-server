@@ -55,7 +55,7 @@ const consumer = {
 		default: ''
 	},
 	LK: {
-		type: Number
+		type: 'string'
 	},
 	lastUpdated: {
 		type: String,
