@@ -28,14 +28,20 @@ export const addConsumer = async (data) => {
 	}
 };
 
-export const getConsumer = async (conId) => {
+export const getConsumer = async (input) => {
 	try {
-		// Convert conId to string and use regex for partial match
-		const regex = new RegExp(conId.toString());
+		// Check if the input is a number
+		const isNumeric = /^\d+$/.test(input);
 
-		// Find the consumer by partial conId
+		// Create a regex for partial matching
+		const regex = new RegExp(input.toString(), 'i'); // 'i' makes it case-insensitive
+
+		// Determine the search field based on input type
+		const searchField = isNumeric ? 'conId' : 'name';
+
+		// Find the consumer by either conId or name
 		const consumer = await consumerCollection.find({
-			conId: { $regex: regex }
+			[searchField]: { $regex: regex }
 		});
 
 		return { data: consumer, statusCode: 200 };
@@ -44,6 +50,7 @@ export const getConsumer = async (conId) => {
 		return { data: 'Consumer not found', statusCode: 403 };
 	}
 };
+
 
 // export const getAllConsumer = async (conId) => {
 // 	try {
