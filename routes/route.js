@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 router.post('/fetchExcel', upload.single('file'), async (req, res) => {
 	if (!req.file) {
 		return res.status(400).send('No file uploaded.');
-	}
+	} 
 	const response = await excelReader(req.file.path);
 	res.status(200).json(response);
 });
@@ -42,6 +42,10 @@ router.get('/getAllUsers', async (req, res) => {
 // Consumer app
 router.post('/addConsumer', async (req, res) => {
 	const response = await addConsumer(req.body);
+	res.status(response.statusCode).send(response.data);
+});
+router.post('/addAllConsumers', async (req, res) => {
+	const response = await addAllConsumers(req.body);
 	res.status(response.statusCode).send(response.data);
 });
 router.get('/getConsumer/:id', async (req, res) => {
