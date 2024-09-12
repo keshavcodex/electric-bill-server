@@ -5,7 +5,11 @@ import {
 	getAllUsers,
 	getUser
 } from '../services/userServices.js';
-import { addConsumer, getConsumer } from '../services/consumerServices.js';
+import {
+	addConsumer,
+	getConsumer,
+	addAllConsumers
+} from '../services/consumerServices.js';
 import { excelReader } from '../services/excelReader.js';
 import multer from 'multer';
 
@@ -18,7 +22,7 @@ router.get('/', async (req, res) => {
 router.post('/fetchExcel', upload.single('file'), async (req, res) => {
 	if (!req.file) {
 		return res.status(400).send('No file uploaded.');
-	} 
+	}
 	const response = await excelReader(req.file.path);
 	res.status(200).json(response);
 });
