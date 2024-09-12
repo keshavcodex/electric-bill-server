@@ -12,9 +12,6 @@ export const addConsumer = async (data) => {
 			conId
 		});
 
-		console.log('previousConsumer', previousConsumer, '\n');
-		console.log('new data to feed', data);
-
 		if (previousConsumer) {
 			// Updating previous consumer
 			const response = await consumerCollection.updateOne(
@@ -24,11 +21,39 @@ export const addConsumer = async (data) => {
 			return { data: response, statusCode: 200 };
 		} else {
 			// Saving new consumer
-			const newConsumer = new consumerCollection({ ...data, billMonth: formattedBillMonth });
+			const newConsumer = new consumerCollection({
+				...data,
+				billMonth: formattedBillMonth
+			});
 			const response = await newConsumer.save();
 			return { data: response, statusCode: 200 };
 		}
 	} catch (error) {
+		return { data: 'Consumer addition failed', statusCode: 500 };
+	}
+};
+
+export const addAllConsumers = async (consumersData) => {
+	try {
+		// Format and prepare data for upsert
+		const bulkOps = consumersData.map((data) => ({
+			updateOne: {
+				filter: { conId: data.conId }, // Check for existing record based on unique field
+				update: {
+					$set: data
+				},
+				upsert: true // Insert if the record does not exist
+			}
+		}));
+
+		// Execute bulk operation
+		const result = await consumerCollection.bulkWrite(bulkOps, {
+			ordered: false
+		});
+
+		return { data: result, statusCode: 200 };
+	} catch (error) {
+		console.error('Error adding all consumers:', error);
 		return { data: 'Consumer addition failed', statusCode: 500 };
 	}
 };
@@ -55,7 +80,6 @@ export const getConsumer = async (input) => {
 		return { data: 'Consumer not found', statusCode: 403 };
 	}
 };
-
 
 // export const getAllConsumer = async (conId) => {
 // 	try {

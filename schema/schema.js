@@ -48,7 +48,7 @@ const consumer = {
 	},
 	bill: {
 		type: Number,
-		required: true
+		default: 0
 	},
 	billMonth: {
 		type: 'string',

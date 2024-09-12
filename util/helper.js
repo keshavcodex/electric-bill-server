@@ -25,8 +25,27 @@ export const matchDate = (date1, date2) => {
 export const formatBillMonth = (billMonth) => {
 	const [month, year] = billMonth.toString().split('.');
 	const monthNames = [
-		'January', 'February', 'March', 'April', 'May', 'June',
-		'July', 'August', 'September', 'October', 'November', 'December'
+		'January',
+		'February',
+		'March',
+		'April',
+		'May',
+		'June',
+		'July',
+		'August',
+		'September',
+		'October',
+		'November',
+		'December'
 	];
 	return `${monthNames[parseInt(month) - 1]}, 20${year}`;
+};
+
+export const toTitleCase = (str) => {
+	return str
+		.toString()
+		.toLowerCase()
+		.split(' ')
+		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+		.join(' ');
 };

@@ -1,11 +1,26 @@
 import express from 'express';
-import { login, register, getAllUsers, getUser } from '../services/userServices.js';
+import {
+	login,
+	register,
+	getAllUsers,
+	getUser
+} from '../services/userServices.js';
 import { addConsumer, getConsumer } from '../services/consumerServices.js';
+import { excelReader } from '../services/excelReader.js';
+import multer from 'multer';
 
 const router = express.Router();
+const upload = multer({ dest: 'uploads/' });
 
 router.get('/', async (req, res) => {
 	res.status(200).send('Electrical bill app server up');
+});
+router.post('/fetchExcel', upload.single('file'), async (req, res) => {
+	if (!req.file) {
+		return res.status(400).send('No file uploaded.');
+	}
+	const response = await excelReader(req.file.path);
+	res.status(200).json(response);
 });
 router.post('/login', async (req, res) => {
 	const response = await login(req.body);
@@ -46,10 +61,8 @@ router.get('/getConsumer/:id', async (req, res) => {
 // 	res.status(response.statusCode).send(response.data);
 // });
 
-
-
-router.use('*', (req, res)=>{
-	res.send("This route is unavailable");
-})
+router.use('*', (req, res) => {
+	res.send('This route is unavailable');
+});
 
 export default router;
