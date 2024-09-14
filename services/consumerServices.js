@@ -3,7 +3,7 @@ import { formatReadingMonth } from '../util/helper.js';
 
 export const addConsumer = async (data) => {
 	try {
-		const { conId, name, reading, status, readingMonth } = data;
+		const { conId, name, reading, status, readingMonth, book, category } = data;
 
 		// Format the readingMonth
 		const formattedReadingMonth = formatReadingMonth(readingMonth);
@@ -23,7 +23,6 @@ export const addConsumer = async (data) => {
 			},
 			{ new: true, upsert: true } // `new: true` returns the updated document, `upsert: true` inserts if not found
 		);
-
 		return { data: response, statusCode: 200 };
 	} catch (error) {
 		console.error('Error adding/updating consumer:', error);
@@ -104,16 +103,16 @@ export const deleteConsumerByDate = async (date) => {
 
 export const renameFields = async () => {
 	try {
-        const response = await consumerCollection.updateMany(
-            {}, // Match all documents
-            {
-                $rename: {
-                    'bill': 'reading',
-                    'billMonth': 'readingMonth',
-                    'LK': 'status'
-                }
-            }
-        );
+		const response = await consumerCollection.updateMany(
+			{}, // Match all documents
+			{
+				$rename: {
+					bill: 'reading',
+					billMonth: 'readingMonth',
+					LK: 'status'
+				}
+			}
+		);
 		console.log('Fields renamed successfully:', JSON.stringify(response));
 		return response.acknowledged
 			? { data: 'Fields renamed successfully', statusCode: 200 }
@@ -124,5 +123,30 @@ export const renameFields = async () => {
 	} catch (error) {
 		console.error('Error renaming fields:', error);
 		return { data: 'Field renaming failed', statusCode: 500 };
+	}
+};
+
+export const addFields = async (body) => {
+	try {
+		const fieldsArray = body?.fieldsString.split(',').map((str) => str.trim());
+		const updateObject = {};
+		fieldsArray.forEach(key => {
+            if (key) {
+                updateObject[key] = ""; // Set the default value (empty string) for each key
+            }
+        });
+		// Update all documents with the parsed fields
+		await consumerCollection.updateMany(
+			{}, // Match all documents
+			{
+				$set: updateObject
+			}
+		);
+
+		console.log('Fields updated successfully.');
+		return { data: 'Fields updated successfully', statusCode: 200 };
+	} catch (error) {
+		console.error('Error updating fields:', error);
+		return { data: 'Error updating fields', statusCode: 500 };
 	}
 };
