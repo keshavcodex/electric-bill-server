@@ -72,7 +72,7 @@ export const getConsumer = async (input) => {
 		// Find the consumer by either conId or name
 		const consumer = await consumerCollection.find({
 			[searchField]: { $regex: regex }
-		});
+		}).sort({ [sortField]: 1 });
 
 		return { data: consumer, statusCode: 200 };
 	} catch (error) {
@@ -83,19 +83,11 @@ export const getConsumer = async (input) => {
 
 export const deleteConsumerByDate = async (date) => {
 	try {
-		console.log(date.start);
-		console.log(date.end);
 		// Convert the start and end date strings to Date objects
 		const startDate = new Date(date.start).toISOString();
 		const endDate = new Date(date.end).toISOString();
 
 		// Delete documents within the specified date range
-		//   const result = await consumerCollection.deleteMany({
-		// 	lastUpdated: {
-		// 	  $gte: startDate,
-		// 	  $lt: endDate,
-		// 	},
-		//   });
 		const result = await consumerCollection.deleteMany({
 			lastUpdated: {
 			  $gte: startDate,
