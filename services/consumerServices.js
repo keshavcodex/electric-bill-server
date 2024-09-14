@@ -72,7 +72,7 @@ export const getConsumer = async (input) => {
 		// Find the consumer by either conId or name
 		const consumer = await consumerCollection.find({
 			[searchField]: { $regex: regex }
-		}).sort({ [sortField]: 1 });
+		}).sort({ name: 1 });
 
 		return { data: consumer, statusCode: 200 };
 	} catch (error) {
