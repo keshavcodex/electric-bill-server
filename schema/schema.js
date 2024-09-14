@@ -46,11 +46,11 @@ const consumer = {
 		type: 'string',
 		default: ''
 	},
-	bill: {
+	reading: {
 		type: Number,
 		default: 0
 	},
-	billMonth: {
+	readingMonth: {
 		type: 'string',
 		default: ''
 	},
@@ -62,8 +62,9 @@ const consumer = {
 		type: 'string',
 		default: ''
 	},
-	LK: {
-		type: 'string'
+	status: {
+		type: 'string',
+		default: 'Ok'
 	},
 	lastUpdated: {
 		type: String,

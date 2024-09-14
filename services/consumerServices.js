@@ -1,34 +1,32 @@
 import { consumerCollection } from '../schema/schema.js';
-import { formatBillMonth } from '../util/helper.js';
+import { formatReadingMonth } from '../util/helper.js';
 
 export const addConsumer = async (data) => {
 	try {
-		const { conId, name, bill, LK, billMonth } = data;
+		const { conId, name, reading, status, readingMonth } = data;
 
-		// Format the billMonth
-		const formattedBillMonth = formatBillMonth(billMonth);
+		// Format the readingMonth
+		const formattedReadingMonth = formatReadingMonth(readingMonth);
 
-		const previousConsumer = await consumerCollection.findOne({
-			conId
-		});
+		// Use findOneAndUpdate with upsert option to update or insert the consumer
+		const response = await consumerCollection.findOneAndUpdate(
+			{ conId },
+			{
+				$set: {
+					name,
+					reading,
+					status,
+					readingMonth: formattedReadingMonth,
+					book,
+					category
+				}
+			},
+			{ new: true, upsert: true } // `new: true` returns the updated document, `upsert: true` inserts if not found
+		);
 
-		if (previousConsumer) {
-			// Updating previous consumer
-			const response = await consumerCollection.updateOne(
-				{ _id: previousConsumer._id },
-				{ $set: { bill, name, LK, billMonth: formattedBillMonth } }
-			);
-			return { data: response, statusCode: 200 };
-		} else {
-			// Saving new consumer
-			const newConsumer = new consumerCollection({
-				...data,
-				billMonth: formattedBillMonth
-			});
-			const response = await newConsumer.save();
-			return { data: response, statusCode: 200 };
-		}
+		return { data: response, statusCode: 200 };
 	} catch (error) {
+		console.error('Error adding/updating consumer:', error);
 		return { data: 'Consumer addition failed', statusCode: 500 };
 	}
 };
@@ -70,9 +68,11 @@ export const getConsumer = async (input) => {
 		const searchField = isNumeric ? 'conId' : 'name';
 
 		// Find the consumer by either conId or name
-		const consumer = await consumerCollection.find({
-			[searchField]: { $regex: regex }
-		}).sort({ name: 1 });
+		const consumer = await consumerCollection
+			.find({
+				[searchField]: { $regex: regex }
+			})
+			.sort({ name: 1 });
 
 		return { data: consumer, statusCode: 200 };
 	} catch (error) {
@@ -90,14 +90,39 @@ export const deleteConsumerByDate = async (date) => {
 		// Delete documents within the specified date range
 		const result = await consumerCollection.deleteMany({
 			lastUpdated: {
-			  $gte: startDate,
-			  $lt: endDate,
-			},
+				$gte: startDate,
+				$lt: endDate
+			}
 		});
 		console.log(`${result.deletedCount} documents were deleted.`);
 		return { data: result, statusCode: 200 };
 	} catch (error) {
 		console.error('Error deleting documents:', error);
 		return { data: 'documents not deleted correctly.', statusCode: 500 };
+	}
+};
+
+export const renameFields = async () => {
+	try {
+        const response = await consumerCollection.updateMany(
+            {}, // Match all documents
+            {
+                $rename: {
+                    'bill': 'reading',
+                    'billMonth': 'readingMonth',
+                    'LK': 'status'
+                }
+            }
+        );
+		console.log('Fields renamed successfully:', JSON.stringify(response));
+		return response.acknowledged
+			? { data: 'Fields renamed successfully', statusCode: 200 }
+			: {
+					data: 'Fields renamed failed',
+					statusCode: 501
+			  };
+	} catch (error) {
+		console.error('Error renaming fields:', error);
+		return { data: 'Field renaming failed', statusCode: 500 };
 	}
 };
