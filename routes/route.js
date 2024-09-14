@@ -8,7 +8,8 @@ import {
 import {
 	addConsumer,
 	getConsumer,
-	addAllConsumers
+	addAllConsumers,
+	deleteConsumerByDate
 } from '../services/consumerServices.js';
 import { excelReader } from '../services/excelReader.js';
 import multer from 'multer';
@@ -54,6 +55,10 @@ router.post('/addAllConsumers', async (req, res) => {
 });
 router.get('/getConsumer/:id', async (req, res) => {
 	const response = await getConsumer(req.params.id);
+	res.status(response.statusCode).send(response.data);
+});
+router.post('/deleteConsumerByDate', async (req, res) => {
+	const response = await deleteConsumerByDate(req.body);
 	res.status(response.statusCode).send(response.data);
 });
 // router.get('/getAllConsumer/:id', async (req, res) => {

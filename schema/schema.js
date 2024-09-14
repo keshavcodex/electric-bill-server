@@ -54,6 +54,14 @@ const consumer = {
 		type: 'string',
 		default: ''
 	},
+	category: {
+		type: 'string',
+		default: ''
+	},
+	book: {
+		type: 'string',
+		default: ''
+	},
 	LK: {
 		type: 'string'
 	},

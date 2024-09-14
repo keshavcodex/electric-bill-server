@@ -81,6 +81,35 @@ export const getConsumer = async (input) => {
 	}
 };
 
+export const deleteConsumerByDate = async (date) => {
+	try {
+		console.log(date.start);
+		console.log(date.end);
+		// Convert the start and end date strings to Date objects
+		const startDate = new Date(date.start).toISOString();
+		const endDate = new Date(date.end).toISOString();
+
+		// Delete documents within the specified date range
+		//   const result = await consumerCollection.deleteMany({
+		// 	lastUpdated: {
+		// 	  $gte: startDate,
+		// 	  $lt: endDate,
+		// 	},
+		//   });
+		const result = await consumerCollection.deleteMany({
+			lastUpdated: {
+			  $gte: startDate,
+			  $lt: endDate,
+			},
+		});
+		console.log(`${result.deletedCount} documents were deleted.`);
+		return { data: result, statusCode: 200 };
+	} catch (error) {
+		console.error('Error deleting documents:', error);
+		return { data: 'documents not deleted correctly.', statusCode: 500 };
+	}
+};
+
 // export const getAllConsumer = async (conId) => {
 // 	try {
 // 		const usersWeight = await weight.find({ conId }, null, {
@@ -100,16 +129,6 @@ export const getConsumer = async (input) => {
 // 	} catch (error) {
 // 		console.log(error);
 // 		return { data: 'user not found', statusCode: 403 };
-// 	}
-// };
-// export const deleteConsumer = async (weightId) => {
-// 	try {
-// 		const deleteInfo = await weight.deleteOne({ _id: weightId });
-// 		console.log('deleteInfo', deleteInfo);
-// 		return { data: `${weightId} deleted successfully.`, statusCode: 200 };
-// 	} catch (error) {
-// 		console.log(error);
-// 		return { data: `${weightId} deletion failed!`, statusCode: 403 };
 // 	}
 // };
 // export const updatedconId = async (data) => {
